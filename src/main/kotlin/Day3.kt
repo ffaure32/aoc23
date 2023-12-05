@@ -29,27 +29,26 @@ class Day3 {
         val prev = max(0, range.first - 1)
         val next = min(lastIndex, range.last + 1)
         val extendedRange = IntRange(prev, next)
-        val valueInt = value
         if (lineIndex > 0) {
             val indexOf = readInput[lineIndex - 1].substring(extendedRange).indexOf('*')
             if(indexOf>=0) {
-                addPair(Pair(lineIndex - 1, prev + indexOf), valueInt)
+                addPair(Pair(lineIndex - 1, prev + indexOf), value)
             }
         }
         if (lineIndex < readInput.size - 1) {
             val indexOf = readInput[lineIndex + 1].substring(extendedRange).indexOf('*')
             if(indexOf>=0) {
-                addPair(Pair(lineIndex + 1, prev + indexOf), valueInt)
+                addPair(Pair(lineIndex + 1, prev + indexOf), value)
             }
         }
         if (prev >= 0) {
             if(readInput[lineIndex][prev] == '*') {
-                addPair(Pair(lineIndex, prev), valueInt)
+                addPair(Pair(lineIndex, prev), value)
             }
         }
         if (next <= lastIndex) {
             if(readInput[lineIndex][next] == '*') {
-                addPair(Pair(lineIndex, next), valueInt)
+                addPair(Pair(lineIndex, next), value)
             }
         }
     }
