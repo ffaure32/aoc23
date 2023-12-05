@@ -13,5 +13,10 @@
     <orderEntry type="library" name="KotlinJavaRuntime" level="project" />
     <orderEntry type="library" name="jetbrains.kotlin.test" level="project" />
     <orderEntry type="library" name="junit.jupiter.api" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.core" level="project" />
+    <orderEntry type="library" name="jetbrains.kotlinx.coroutines.test" level="project" />
+  </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="4c1bc63f-a100-4497-ac94-a32d9007784c" />
   </component>
 </module>
