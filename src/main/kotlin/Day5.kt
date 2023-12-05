@@ -4,7 +4,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 
 class Day5 {
-    private val input = readInput(501)
+    private val input = readInput(5)
     private val seeds = Regex("\\d+").findAll(input[0]).map(MatchResult::value).map(String::toLong).toList()
 
     private var lineIndex = 3
@@ -42,7 +42,7 @@ class Day5 {
 
     class IntermediateRange(private val destinationRangeStart: Long, val sourceRangeStart : Long,
                             rangeLength : Long) {
-        private val range = LongRange(sourceRangeStart, sourceRangeStart+rangeLength)
+        private val range = LongRange(sourceRangeStart, sourceRangeStart+rangeLength-1)
 
         fun sourceInRange(source : Long): Boolean {
             return source in range

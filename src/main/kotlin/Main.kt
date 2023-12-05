@@ -1,5 +1,3 @@
-import java.io.File
-
 fun main(args: Array<String>) {
     println("Hello World!")
 
@@ -8,5 +6,3 @@ fun main(args: Array<String>) {
     println("Program arguments: ${args.joinToString()}")
 }
 
-fun readInput(day: Int)
-        = File(ClassLoader.getSystemResource("day${day}.txt").file).readLines(Charsets.UTF_8)
