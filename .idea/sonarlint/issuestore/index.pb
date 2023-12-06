@@ -13,3 +13,15 @@ H
 src/main/kotlin/Utils.kt,2\5\252fc221e2e45bb9db5a5178f160879fcb73aab4
 N
 src/main/kotlin/InputReader.kt,6\c\6ce155f5e5c45d4b112689f7a91d3afeaf8dd577
+G
+src/main/kotlin/Day1.kt,2\b\2b602f9ac3c268f8f2315fca2589dc3c64d13db5
+G
+src/main/kotlin/Main.kt,d\8\d83ae3847b7d408136086cc5e9e95f5f7c126ed5
+Q
+!src/main/kotlin/InputReader.kt.kt,5\9\59dcf08d10c0a2bfbd6e7687e5f6befb6afe8e64
+G
+src/main/kotlin/Day6.kt,f\a\fa3941fc185784f6fd54bfcfcc1483a30ac150ce
+K
+src/test/kotlin/Day6Test.kt,c\2\c25eb340f5636b8e9afff18b865b8435dcbf6389
+S
+#.idea/sonarlint/issuestore/index.pb,9\f\9fe84ebb15faf917b7def6236dba604453cc61e0
