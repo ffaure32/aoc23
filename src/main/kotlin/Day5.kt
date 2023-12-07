@@ -1,11 +1,8 @@
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 
 class Day5 {
     private val input = readInput(5)
-    private val seeds = Regex("\\d+").findAll(input[0]).map(MatchResult::value).map(String::toLong).toList()
+    private val seeds = lineToInts(input[0])
 
     private var lineIndex = 3
     private val intermediateMappings = IntRange(1, 7).map{ IntermediateRangeList(getNextRangeList()) }.toList()
@@ -21,7 +18,9 @@ class Day5 {
         computeLocation(it)
     }
 
-    suspend fun part2() : Long = withContext(Dispatchers.IO) {
+    private val coroutineDispatcher : CoroutineDispatcher = Dispatchers.Default
+
+    suspend fun part2() : Long = withContext(coroutineDispatcher) {
         seedsWithRanges.map { range -> async {range.minOf(::computeLocation) }}.awaitAll().min()
     }
 
