@@ -53,7 +53,7 @@ class Hand(private val hand: String, val bid: Int, private val pimped: Boolean =
     private val handScoreWithJoker = if(pimped) handStrength.pimpWithJoker(hand.count { it =='J' }) else handStrength.strength
 
     private val cardsScore = hand.indices.sumOf {
-        cardRank(it) * 15.0.pow((hand.length - it)).toInt()
+        cardRank(it) * 14.0.pow((hand.length - it)).toInt()
     }
 
     override fun compareTo(other: Hand): Int {
