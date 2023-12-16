@@ -9,7 +9,12 @@ class Day12 {
         }
     }
     fun part2() : Int {
-        return 0
+        return input.map {
+            val split = it.split(" ")
+            Row(split[0], split[1], 5)
+        }.sumOf {
+                r -> r.unknownPermutationsRec()
+        }
     }
 
 
@@ -22,16 +27,12 @@ class Row(val initialSprings : String, val initialRecords : String, multiply : I
     val existingPlaces = springs.count { it=='#'}
     val validArrangement = ("\\.*#{"+records.replace(",", "}\\.+#{")+"}\\.*").toRegex()
     fun unknownPermutations(): Int {
-        println(springs)
-        println(records)
-
         val toPlace = totalPlaces-existingPlaces
         val empty = unknowns-toPlace
         val init = mutableListOf<Char>()
         IntRange(1, toPlace).forEach{init.add('#')}
         IntRange(1, empty).forEach{init.add('.')}
         val possiblePermutations = permutations(init)
-        println(validArrangement)
         return possiblePermutations.map {
             var possiblePermutation = springs
             it.forEach {
@@ -41,6 +42,10 @@ class Row(val initialSprings : String, val initialRecords : String, multiply : I
         }.count {
             validArrangement.matches(it)
         }
+    }
+
+    fun unknownPermutationsRec() : Int {
+        return 0
     }
 
 }
