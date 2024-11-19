@@ -39,3 +39,15 @@ L
 src/test/kotlin/Day21Test.kt,e/c/ec0f9e2352b26c859d658d336dc72549766682a1
 H
 src/main/kotlin/Day21.kt,9/8/9839714adc6f6555c16060e120d7ad0fd6b856b2
+H
+src/main/kotlin/Day24.kt,4/c/4c2dd340df8db521773a3eec22e8271534910e9c
+L
+src/test/kotlin/Day24Test.kt,4/2/421cab1d95941b3b99f6a6cfea028dbd8aa591b9
+H
+src/main/kotlin/Day22.kt,e/c/ec5d33872fad4839541e727f82c99b137e95323b
+G
+src/main/kotlin/DayX.kt,f/6/f608803fa487e65ed3076f6319f2e601ce4755b5
+H
+src/main/kotlin/Day25.kt,3/0/3050b74d0d223414d06a6ec576302cf628ffc15a
+L
+src/test/kotlin/Day25Test.kt,2/5/25492204901a8c727fc68386ba51f687b2a428be

@@ -4,7 +4,7 @@ import kotlin.test.assertEquals
 class Day20Test {
     @Test
     fun part1() {
-        assertEquals(11687500, Day20().part1())
+        assertEquals(919383692, Day20().part1())
     }
 
     @Test

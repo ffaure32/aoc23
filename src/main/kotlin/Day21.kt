@@ -4,7 +4,7 @@ import kotlin.math.min
 class Day21 {
     private val input = readInput(21)
     fun part1() : Int {
-        return findPositions(input, 64)
+        return findPositions(input, 150)
     }
     fun part2() : Int {
         return findPositions(input, 26501365)
@@ -15,7 +15,8 @@ fun findPositions(lines: List<String>, stepsCount: Int): Int {
     val garden = initGrid(lines)
     for (i in 1..stepsCount) {
         garden.step()
-        // garden.print()
+        println(i)
+        garden.print()
     }
     return garden.gardenPlots()
 }

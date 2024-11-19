@@ -27,7 +27,7 @@ class Day22 {
 
     private fun buildCoords(coordsString: String) : Coords3D {
         val split = coordsString.split(",")
-        return Coords3D(split[0].toInt(), split[1].toInt(), split[2].toInt())
+        return Coords3D(split[0].toLong(), split[1].toLong(), split[2].toLong())
     }
 }
 
@@ -36,7 +36,7 @@ data class Brick(val leftCoords: Coords3D, val rightCoords: Coords3D) {
     init{
         occupiedCoords = occupiedCoords()
     }
-    fun minZ() : Int {
+    fun minZ() : Long {
         return min(leftCoords.z, rightCoords.z)
     }
     fun down() : Brick {
@@ -57,9 +57,27 @@ data class Brick(val leftCoords: Coords3D, val rightCoords: Coords3D) {
 }
 
 
-data class Coords3D( val x: Int, val y: Int, val z: Int) {
+data class Coords3D( val x: Long, val y: Long, val z: Long) {
     fun down() : Coords3D {
         return Coords3D(x, y, z - 1)
+    }
+
+    operator fun minus(other: Coords3D): Coords3D {
+        return Coords3D(this.x - other.x, this.y -other.y, this.z - other.z)
+    }
+
+    operator fun plus(other: Coords3D): Coords3D {
+        return Coords3D(this.x + other.x, this.y + other.y, this.z + other.z)
+    }
+
+    fun cross(other: Coords3D): Coords3D {
+        return Coords3D(this.y*other.z - this.z*other.y,
+                        this.z*other.x - this.x*other.z,
+                        this.x*other.y - this.y*other.x)
+    }
+
+    operator fun times(other: Coords3D): Long {
+        return (this.x * other.x+ this.y * other.y+ this.z * other.z)
     }
 }
 
@@ -110,7 +128,7 @@ class Pyramid(val bricks: List<Brick>) {
 }
 
 fun canFall(brick: Brick, stableCoords: Set<Coords3D>): Boolean {
-    if (brick.minZ() == 1) {
+    if (brick.minZ() == 1L) {
         return false
     } else {
         val ifDown = brick.down()
