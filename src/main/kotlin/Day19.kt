@@ -1,5 +1,13 @@
 import kotlin.math.*
 
+private const val INF_SIGN = '<'
+private const val SUP_SIGN = '>'
+private const val INPUT_WORKFLOW_NAME = "in"
+private const val ACCEPTED_VALUE = "A"
+val xmas = listOf('x', 'm', 'a', 's')
+private const val RANGE_MIN = 1
+private const val RANGE_MAX = 4000
+
 class Day19 {
     private val input = readInput(19)
     fun part1(): Int {
@@ -15,25 +23,21 @@ class Day19 {
 
     private fun findValidRanges(workflows: List<Workflow>): List<List<AcceptedRange>> {
         val ranges = workflows.map {
-            findValidRange(it, workflows)
+            val acceptedChildRanges = it.acceptedRanges()
+            acceptedRanges(it, acceptedChildRanges, workflows)
         }
         return ranges
     }
 
-    private fun findValidRange(currentWorkflow: Workflow, workflows: List<Workflow>): List<AcceptedRange> {
-        val finalRanges = currentWorkflow.acceptedRanges()
-        return acceptedRanges(currentWorkflow, finalRanges, workflows)
-    }
-
-    private fun findParentRanges(workflows: List<Workflow>, workflow: Workflow, finalRanges: List<AcceptedRange>) : List<AcceptedRange>{
-        val parentWorkflow = workflows.first { w ->
-            w.rules.any { r -> r.target == workflow.name }
+    private fun findParentRanges(workflows: List<Workflow>, targetWorkflow: Workflow, childRanges: List<AcceptedRange>) : List<AcceptedRange>{
+        val sourceWorkflow = workflows.first { w ->
+            w.rules.any { r -> r.target == targetWorkflow.name }
         }
-        val originRule = parentWorkflow.rules.find { r -> r.target == workflow.name }!!
-        val acceptedRange = parentWorkflow.acceptedRange(originRule)
+        val sourceRule = sourceWorkflow.rules.first { r -> r.target == targetWorkflow.name }
+        val sourceAcceptedRange = sourceWorkflow.acceptedRange(sourceRule)
 
-        val toReturn = finalRanges.map { (it.merge(acceptedRange)) }
-        return acceptedRanges(parentWorkflow, toReturn, workflows)
+        val mergedRanges = childRanges.map { (it.merge(sourceAcceptedRange)) }
+        return acceptedRanges(sourceWorkflow, mergedRanges, workflows)
 
     }
 
@@ -49,8 +53,8 @@ class Day19 {
 
 fun parsePart(input: String): Workflow {
     val (name, rules) = input.split("{")
-    val splittedRules = rules.dropLast(1).split(",")
-    return Workflow(name, splittedRules.map {
+    val splitRules = rules.dropLast(1).split(",")
+    return Workflow(name, splitRules.map {
         val rule = it.split(":")
         if (rule.size == 1) {
             Rule(TrueCondition(), rule[0])
@@ -61,16 +65,14 @@ fun parsePart(input: String): Workflow {
 }
 
 fun buildPartCondition(partString: String): Condition {
-    return if (partString.contains("<")) {
-        val (part, limit) = partString.split("<")
-        PartCondition(part[0], '<', limit.toInt())
+    return if (partString.contains(INF_SIGN)) {
+        val (part, limit) = partString.split(INF_SIGN)
+        PartCondition(part[0], INF_SIGN, limit.toInt())
     } else {
-        val (part, limit) = partString.split(">")
-        PartCondition(part[0], '>', limit.toInt())
+        val (part, limit) = partString.split(SUP_SIGN)
+        PartCondition(part[0], SUP_SIGN, limit.toInt())
     }
 }
-
-private const val ACCEPTED_VALUE = "A"
 
 data class Workflow(val name: String, val rules: List<Rule>) {
     fun acceptedRanges(): List<AcceptedRange> {
@@ -88,13 +90,9 @@ data class Workflow(val name: String, val rules: List<Rule>) {
     }
 
     fun isRootWorkflow(): Boolean {
-        return name == "in"
+        return name == INPUT_WORKFLOW_NAME
     }
 }
-
-val xmas = listOf('x', 'm', 'a', 's')
-private const val RANGE_MIN = 1
-private const val RANGE_MAX = 4000
 
 class AcceptedRange(acceptedRule: Rule) {
     val ranges = xmas.associateWith { IntRange(RANGE_MIN, RANGE_MAX) }.toMutableMap()
@@ -117,7 +115,7 @@ class AcceptedRange(acceptedRule: Rule) {
     }
 
     fun combinations(): Long {
-        return ranges.values.map { (it.last - it.first + 1).toLong() }.multiply()
+        return ranges.values.map { (it.count()).toLong() }.multiply()
     }
 }
 
@@ -133,7 +131,7 @@ data class PartCondition(val target: Char, val sign: Char, val limit: Int) : Con
     override fun validRange(ranges: MutableMap<Char, IntRange>) {
         val intRange = ranges.getValue(target)
         val otherRange =
-            if (sign == '<') {
+            if (sign == INF_SIGN) {
                 IntRange(RANGE_MIN, limit - 1)
             } else {
                 IntRange(limit + 1, RANGE_MAX)
@@ -144,7 +142,7 @@ data class PartCondition(val target: Char, val sign: Char, val limit: Int) : Con
     override fun validReverseRange(ranges: MutableMap<Char, IntRange>) {
         val intRange = ranges.getValue(target)
         val otherRange =
-            if (sign == '<') {
+            if (sign == INF_SIGN) {
                 IntRange(limit, RANGE_MAX)
             } else {
                 IntRange(RANGE_MIN, limit)
@@ -154,8 +152,7 @@ data class PartCondition(val target: Char, val sign: Char, val limit: Int) : Con
 
 }
 
-fun mergeRanges(firstRange: IntRange, otherRange: IntRange, target: Char, ranges: MutableMap<Char, IntRange>
-) {
+fun mergeRanges(firstRange: IntRange, otherRange: IntRange, target: Char, ranges: MutableMap<Char, IntRange>) {
     val newMin = max(firstRange.first, otherRange.first)
     val newMax = min(firstRange.last, otherRange.last)
     ranges[target] = IntRange(newMin, newMax)
