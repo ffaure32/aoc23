@@ -7,9 +7,12 @@ class Day23 {
     }
 
     fun part2(): Int {
-        return 0
+        val withoutSplip = input.map{ it.replace('>', '.').replace('v', '.')}
+        val maze = SegmentChunk(withoutSplip)
+        return maze.length()
     }
 }
+
 
 class MazePath(startPath : List<Coords2D>) {
 
@@ -32,6 +35,91 @@ class MazePath(startPath : List<Coords2D>) {
 
 }
 
+data class Segment(val target : Coords2D, val length : Int) {}
+data class SegmentPath(val intersections : List<Coords2D>, val length : Int)
+
+class SegmentChunk(val input: List<String>) {
+    val size = input.size
+    val exit = exit()
+    val intersections = buildIntersections()
+    val segments = buildSegments()
+    val finished = buildPath()
+
+    fun buildSegments(): Map<Coords2D, Set<Segment>> {
+        val segmentsMap = mutableMapOf<Coords2D, Set<Segment>>()
+        intersections.forEach {
+            val segments = mutableSetOf<Segment>()
+            it.neighbours(size).filter { value(it) == '.' }.forEach{
+                    n ->
+                var length = 1
+                var nextPath = n
+                val path = mutableListOf<Coords2D>()
+                path.add(it)
+                while(!intersections.contains(nextPath)) {
+                    path.add(nextPath)
+                    nextPath = nextPath.neighbours(size).first { value(it) == '.' && !path.contains(it)}
+                    length++
+                }
+                segments.add(Segment(nextPath, length))
+            }
+            segmentsMap[it] = segments
+        }
+        return segmentsMap
+    }
+
+    fun length() : Int {
+        return finished.maxOf { sp -> sp.length }
+    }
+    fun buildPath(): MutableSet<SegmentPath> {
+        var segmentPaths = mutableSetOf<SegmentPath>()
+        val finishedSegments = mutableSetOf<SegmentPath>()
+        val start = segments[start()]
+        start!!.forEach {
+            segmentPaths.add(SegmentPath(listOf(start(), it.target), it.length))
+        }
+        while(segmentPaths.isNotEmpty()) {
+            val newSegments = segmentPaths.flatMap { sp ->
+                val newSegments = segments[sp.intersections.last()]
+                newSegments!!.filter { s -> !sp.intersections.contains(s.target) }.map {
+                    SegmentPath(sp.intersections.plus(it.target), sp.length + it.length)
+                }
+            }
+            segmentPaths = newSegments.filter { sp -> sp.intersections.last() != exit }.toMutableSet()
+            finishedSegments.addAll(newSegments.filter { sp -> sp.intersections.last() == exit })
+        }
+        return finishedSegments
+    }
+
+    fun buildIntersections(): MutableSet<Coords2D> {
+        val intersections = mutableSetOf<Coords2D>()
+        intersections.add(start())
+        intersections.add(exit())
+        for (x in input.indices) {
+            for (y in input.indices) {
+                val coords2D = Coords2D(x, y)
+                if (value(Coords2D(x, y)) == '.' && coords2D.neighbours(size).filter { value(it) == '.' }.size > 2) {
+                    intersections.add(coords2D)
+                }
+            }
+        }
+        return intersections
+    }
+
+    fun start(): Coords2D {
+        return Coords2D(input[0].indexOf('.'), 0)
+    }
+
+    fun exit(): Coords2D {
+        return Coords2D(input[input.size - 1].indexOf('.'), input.size - 1)
+    }
+
+    fun value(pos : Coords2D) : Char {
+        return input[pos.y][pos.x]
+    }
+
+
+}
+
 class Maze(val input: List<String>) {
     val size = input.size
     var paths = listOf(MazePath(start()))
@@ -41,25 +129,15 @@ class Maze(val input: List<String>) {
         while(paths.any { it.last() != exit }) {
             val newPaths = paths.filter{
                 it.last() != exit
-            }.flatMap { buildNewPaths(it) }
+            }.flatMap {
+                buildNewPaths(it) }
                 .toMutableList()
-
-/*
-            newPaths.removeIf {
-                newPath ->
-                    newPath.steps.filterIndexed { index, _ -> index < newPath.steps.size-90 }.any { step ->
-                        newPaths.any { otherPath -> step == otherPath.last() }
-                    }
-            }
-*/
-
-            println(newPaths.size)
             paths = newPaths
         }
     }
 
     fun longestPath(): Int {
-        return paths.map {it.length()}.max()
+        return paths.maxOf { it.length() }
     }
 
     private fun buildNewPaths(mazePath: MazePath): List<MazePath> {
@@ -67,7 +145,7 @@ class Maze(val input: List<String>) {
         val possiblePath = nextPath(last)
         return possiblePath
             .filter { value(it) != '#' }
-            //.filter { next -> slipping(next, last) }
+            .filter { next -> slipping(next, last) }
             .filter { pos -> mazePath.isFree(pos) }
             .map {
                 val newPath = mazePath.steps.toMutableList()
@@ -104,9 +182,9 @@ class Maze(val input: List<String>) {
 data class Coords2D(val x: Int, val y: Int) {
     fun neighbours(size : Int): List<Coords2D> {
         val neighbours = mutableListOf<Coords2D>()
-        if(x>1) neighbours.add(Coords2D(x - 1, y))
+        if(x>0) neighbours.add(Coords2D(x - 1, y))
         if(x<size-1) neighbours.add(Coords2D(x + 1, y))
-        if(y>1) neighbours.add(Coords2D(x, y - 1))
+        if(y>0) neighbours.add(Coords2D(x, y - 1))
         if(y<size-1) neighbours.add(Coords2D(x, y + 1))
         return neighbours
     }
