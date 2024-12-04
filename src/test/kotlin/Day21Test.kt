@@ -17,7 +17,7 @@ class Day21Test {
             .##..##.##.
             ...........
         """.trimIndent().split("\n")
-        val findPositions = findPositions(input, 6)
+        val findPositions = findPositions(input, 6).elfPositions.count()
         assertEquals(16, findPositions)
     }
 
@@ -29,7 +29,7 @@ class Day21Test {
 
     @Test
     fun part2() {
-        assertEquals(8754, Day21().part2())
+        assertEquals(620348631910321, Day21().part2())
     }
 
     @Test
@@ -48,7 +48,7 @@ class Day21Test {
             ...........
         """.trimIndent().split("\n")
         val findPositions = findPositions(input, 500)
-        assertEquals(167004, findPositions)
+        assertEquals(167004, findPositions.elfPositions.count())
     }
 
     @Test
