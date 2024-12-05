@@ -39,6 +39,7 @@ data class Segment(val target : Coords2D, val length : Int) {}
 data class SegmentPath(val intersections : List<Coords2D>, val length : Int)
 
 class SegmentChunk(val input: List<String>) {
+    val finishedSegments = mutableSetOf<SegmentPath>();
     val size = input.size
     val exit = exit()
     val intersections = buildIntersections()
@@ -48,23 +49,29 @@ class SegmentChunk(val input: List<String>) {
     fun buildSegments(): Map<Coords2D, Set<Segment>> {
         val segmentsMap = mutableMapOf<Coords2D, Set<Segment>>()
         intersections.forEach {
-            val segments = mutableSetOf<Segment>()
-            it.neighbours(size).filter { value(it) == '.' }.forEach{
-                    n ->
-                var length = 1
-                var nextPath = n
-                val path = mutableListOf<Coords2D>()
-                path.add(it)
-                while(!intersections.contains(nextPath)) {
-                    path.add(nextPath)
-                    nextPath = nextPath.neighbours(size).first { value(it) == '.' && !path.contains(it)}
-                    length++
-                }
-                segments.add(Segment(nextPath, length))
-            }
-            segmentsMap[it] = segments
+            computeIntersection(it, segmentsMap)
         }
         return segmentsMap
+    }
+
+    fun computeIntersection(
+        it: Coords2D,
+        segmentsMap: MutableMap<Coords2D, Set<Segment>>
+    ) {
+        val segments = mutableSetOf<Segment>()
+        it.neighbours(size).filter { value(it) == '.' }.forEach { n ->
+            var length = 1
+            var nextPath = n
+            val path = mutableListOf<Coords2D>()
+            path.add(it)
+            while (!intersections.contains(nextPath)) {
+                path.add(nextPath)
+                nextPath = nextPath.neighbours(size).first { value(it) == '.' && !path.contains(it) }
+                length++
+            }
+            segments.add(Segment(nextPath, length))
+        }
+        segmentsMap[it] = segments
     }
 
     fun length() : Int {
@@ -72,11 +79,12 @@ class SegmentChunk(val input: List<String>) {
     }
     fun buildPath(): MutableSet<SegmentPath> {
         var segmentPaths = mutableSetOf<SegmentPath>()
-        val finishedSegments = mutableSetOf<SegmentPath>()
         val start = segments[start()]
         start!!.forEach {
             segmentPaths.add(SegmentPath(listOf(start(), it.target), it.length))
         }
+        recSegment(segmentPaths)
+/*
         while(segmentPaths.isNotEmpty()) {
             val newSegments = segmentPaths.flatMap { sp ->
                 val newSegments = segments[sp.intersections.last()]
@@ -87,9 +95,23 @@ class SegmentChunk(val input: List<String>) {
             segmentPaths = newSegments.filter { sp -> sp.intersections.last() != exit }.toMutableSet()
             finishedSegments.addAll(newSegments.filter { sp -> sp.intersections.last() == exit })
         }
+*/
         return finishedSegments
     }
 
+    fun recSegment(segmentPaths : Set<SegmentPath>) {
+        val newSegments = segmentPaths.flatMap { sp ->
+            val newSegments = segments[sp.intersections.last()]
+            newSegments!!.filter { s -> !sp.intersections.contains(s.target) }.map {
+                SegmentPath(sp.intersections.plus(it.target), sp.length + it.length)
+            }
+        }
+        finishedSegments.addAll(newSegments.filter { sp -> sp.intersections.last() == exit })
+        val newSegmentPaths = newSegments.filter { sp -> sp.intersections.last() != exit }.toMutableSet()
+        if(newSegmentPaths.isNotEmpty()) {
+            recSegment(newSegmentPaths)
+        }
+    }
     fun buildIntersections(): MutableSet<Coords2D> {
         val intersections = mutableSetOf<Coords2D>()
         intersections.add(start())
