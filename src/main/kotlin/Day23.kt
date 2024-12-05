@@ -39,12 +39,15 @@ data class Segment(val target : Coords2D, val length : Int) {}
 data class SegmentPath(val intersections : List<Coords2D>, val length : Int)
 
 class SegmentChunk(val input: List<String>) {
-    val finishedSegments = mutableSetOf<SegmentPath>();
+    val finishedSegments = mutableSetOf<SegmentPath>()
     val size = input.size
     val exit = exit()
     val intersections = buildIntersections()
     val segments = buildSegments()
-    val finished = buildPath()
+
+    init {
+        buildPath()
+    }
 
     fun buildSegments(): Map<Coords2D, Set<Segment>> {
         val segmentsMap = mutableMapOf<Coords2D, Set<Segment>>()
@@ -75,28 +78,19 @@ class SegmentChunk(val input: List<String>) {
     }
 
     fun length() : Int {
-        return finished.maxOf { sp -> sp.length }
+        return finishedSegments.maxOf { sp -> sp.length }
     }
-    fun buildPath(): MutableSet<SegmentPath> {
-        var segmentPaths = mutableSetOf<SegmentPath>()
+
+    fun buildPath() {
+        val segmentPaths = mutableSetOf<SegmentPath>()
         val start = segments[start()]
         start!!.forEach {
             segmentPaths.add(SegmentPath(listOf(start(), it.target), it.length))
         }
-        recSegment(segmentPaths)
-/*
-        while(segmentPaths.isNotEmpty()) {
-            val newSegments = segmentPaths.flatMap { sp ->
-                val newSegments = segments[sp.intersections.last()]
-                newSegments!!.filter { s -> !sp.intersections.contains(s.target) }.map {
-                    SegmentPath(sp.intersections.plus(it.target), sp.length + it.length)
-                }
-            }
-            segmentPaths = newSegments.filter { sp -> sp.intersections.last() != exit }.toMutableSet()
-            finishedSegments.addAll(newSegments.filter { sp -> sp.intersections.last() == exit })
+        val depth = DeepRecursiveFunction<Set<SegmentPath>, Unit> { t ->
+            if (t.isEmpty()) Unit else recSegment(segmentPaths)
         }
-*/
-        return finishedSegments
+        depth(segmentPaths)
     }
 
     fun recSegment(segmentPaths : Set<SegmentPath>) {
@@ -138,9 +132,8 @@ class SegmentChunk(val input: List<String>) {
     fun value(pos : Coords2D) : Char {
         return input[pos.y][pos.x]
     }
-
-
 }
+
 
 class Maze(val input: List<String>) {
     val size = input.size
