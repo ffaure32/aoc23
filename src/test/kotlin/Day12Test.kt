@@ -23,6 +23,6 @@ class Day12Test {
 
     @Test
     fun part2() {
-        assertEquals(0, Day12().part2())
+        assertEquals(1909291258644L, Day12().part2())
     }
 }
